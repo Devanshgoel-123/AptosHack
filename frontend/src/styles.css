@@ -1,0 +1,122 @@
+:root{
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --border: #e6e9ef;
+  --accent: #111827;
+  --shadow: rgba(16,24,40,0.06);
+  --text: #0f172a;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--bg);
+  color:var(--text);
+}
+
+.app-root{
+  padding: 18px;
+}
+
+.st-header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.st-header-title{display:flex;gap:12px;align-items:center}
+.st-badge{font-size:20px;background:var(--card);padding:10px;border:1px solid var(--border);border-radius:8px}
+.st-header-title h1{margin:0;font-size:18px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.tiny{font-size:11px}
+
+.st-header-actions .small{padding:8px 12px;border-radius:8px;background:var(--card);border:1px solid var(--border);cursor:pointer}
+
+.layout{
+  display:grid;
+  grid-template-columns: 1fr 360px;
+  gap:18px;
+}
+
+.main-col{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.right-col{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+/* card */
+.card{
+  background:var(--card);
+  border-radius:8px;
+  border:1px solid var(--border);
+  padding:16px;
+  box-shadow: 0 6px 20px var(--shadow);
+}
+
+/* Tokens list */
+.tokens-card h3{margin:0 0 6px 0}
+.tokens-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.token-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  border-radius:6px;
+  border:1px solid transparent;
+  background:transparent;
+  cursor:pointer;
+  transition:all .12s;
+}
+.token-row:hover{background:#fbfcff;border-color:var(--border)}
+.token-left strong{display:block}
+.token-left .muted{font-size:12px;color:var(--muted)}
+.token-right{text-align:right}
+.price{font-weight:600}
+.delta{font-size:12px}
+.delta.up{color:#16a34a}
+.delta.down{color:#ef4444}
+
+/* Influencer tracker */
+.influencer-search{display:flex;gap:8px;margin-top:10px}
+.influencer-search input{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border)}
+.influencer-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.influencer-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;border:1px solid transparent}
+.influencer-row:hover{background:#fbfcff;border-color:var(--border)}
+.avatar{width:40px;height:40px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center}
+.info strong{display:block}
+.meta{margin-left:auto;text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.chip{background:#f3f4f6;padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px}
+
+/* wallets */
+.wallet-row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;border:1px solid transparent}
+.wallet-row + .wallet-row{margin-top:8px}
+.wallet-icon{width:44px;height:44px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center}
+.wallet-value{margin-left:auto;font-weight:600}
+.placeholder{color:var(--muted);padding:10px;border-radius:6px;background:#fbfcff;border:1px dashed var(--border)}
+
+/* buttons */
+.st-primary-btn{
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  padding:10px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.st-primary-btn.full{width:100%}
+.st-secondary-btn{background:transparent;border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer}
+
+/* responsive */
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+}

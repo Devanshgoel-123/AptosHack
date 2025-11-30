@@ -262,13 +262,14 @@ export const GetUserWalletBalance = async (userAddress: string) => {
     const params = {
       userAddress: userAddress,
     };
-    const response = await axios.get(`${PERPS_ENDPOINT}/getWalletAccountBalance`, {
+    const response = await axios.get(`${PERPS_ENDPOINT}/getProfileBalanceSnapshot`, {
       params,
       headers: {
         "x-api-key": process.env.API_KEY,
       },
     });
     const userWalletBalance = response.data.data;
+    console.log("userWalletBalance", userWalletBalance);
     return parseFloat(userWalletBalance);
   }catch(err){
     console.error("Error getting user wallet balance:", err);

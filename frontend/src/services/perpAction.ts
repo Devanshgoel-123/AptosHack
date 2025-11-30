@@ -21,17 +21,19 @@ export interface OpenPositionParams {
   leverage: number;
 }
 
-export interface Position {
-  id?: string;
-  marketId: number;
-  size: number;
+export interface Position {          
+  address: string;
+  available_order_size: number;     // raw.available_order_size
+  entry_price: number;             // raw.entry_price
   leverage: number;
-  side: "LONG" | "SHORT";
-  entryPrice?: number;
-  pnl?: number;
-  [key: string]: any;
+  liq_price: number;               // raw.liq_price
+  margin: number;
+  market_id: number;                 // raw.margin
+  size:string;
+  trade_id:string;         // raw.value
+  trade_side:boolean;
+  value:string;
 }
-
 export interface OrderHistoryItem {
   id?: string;
   marketId?: number;
@@ -115,6 +117,7 @@ export const getPositions = async (address: string): Promise<Position[]> => {
         },
       }
     );
+    console.log("getPositions response", response.data);
     return response.data;
   } catch (err: any) {
     throw new Error(err.response?.data?.message || "Failed to get positions");

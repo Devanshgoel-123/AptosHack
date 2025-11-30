@@ -31,11 +31,11 @@ app.listen(PORT, () => {
   );
 });
 
-//const main = async () => {
-//   const perpsAdapter = new PerpsAdapter();
-//   const positions = await perpsAdapter.getUserWalletBalance(USER_ADDRESS)
-//   console.log("Deposit successful");
-//   console.log("Transaction hash:", positions);
-// };
+const main = async () => {
+  const perpsAdapter = new PerpsAdapter();
+  const positions = await perpsAdapter.getUserWalletBalance(USER_ADDRESS)
+  console.log("Deposit successful");
+  console.log("Transaction hash:", positions);
+};
 
-// main();
+main();

@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { getFearGreedIndex, getTokenAmountOwnedByAccount, fetchTokenPriceInUsd, getHistoricalPrice } from "../services/coingecko";
+import { getFearGreedIndex, getTokenAmountOwnedByAccount, fetchTokenPriceInUsd, getHistoricalPrice, fetchAptosBalance } from "../services/coingecko";
 import { SUCCESS_CODE, INTERNAL_SERVER_ERROR_CODE, BAD_REQUEST_CODE } from "../utils/constants";
 export const coingeckoRoutes = express.Router();
 coingeckoRoutes.use(express.json());
@@ -54,4 +54,20 @@ coingeckoRoutes.get("/getHistoricalPrice", async (req: Request, res: Response) =
     }catch(error){
         return res.status(INTERNAL_SERVER_ERROR_CODE).json({ message: "Failed to get historical price" });
     }
-})
+});
+
+coingeckoRoutes.get("/getAptosBalance", async (req: Request, res: Response) => {
+    try{
+        const { address } = req.query;
+        if(!address || typeof address !== 'string') {
+            return res.status(BAD_REQUEST_CODE).json({ message: "Invalid query parameter: address is required" });
+        }
+        const balance = await fetchAptosBalance(address);
+        if(balance === null) {
+            return res.status(INTERNAL_SERVER_ERROR_CODE).json({ message: "Failed to get Aptos balance" });
+        }
+        return res.status(SUCCESS_CODE).json({ balance, address });
+    }catch(error){
+        return res.status(INTERNAL_SERVER_ERROR_CODE).json({ message: "Failed to get Aptos balance" });
+    }
+});

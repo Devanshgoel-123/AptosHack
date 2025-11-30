@@ -98,7 +98,7 @@ export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: Auto
     // Then poll every 30 seconds
     pollingIntervalRef.current = setInterval(async () => {
       await pollAnalysis();
-    }, 15000);
+    }, 5000);
   };
 
   const stopPolling = () => {

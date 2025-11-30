@@ -54,6 +54,25 @@ export const getTokenAmountOwnedByAccount = async (
 };
 
 /**
+ * @function fetchAptosBalance
+ * @param address string
+ * @description Fetches the AptosCoin balance for an account in APT
+ * @returns number - balance in APT (converted from octas)
+ */
+export const fetchAptosBalance = async (
+  address: string
+): Promise<number | null> => {
+  try {
+    const balance = await aptos.getAccountAPTAmount({ accountAddress: address });
+    // getAccountAPTAmount already returns the balance in APT (not octas)
+    return balance;
+  } catch (error) {
+    console.error("Error fetching Aptos balance:", error);
+    return null;
+  }
+};
+
+/**
  * @function getFearGreedIndex
  * @returns array of GreedIndex
  * @description Fetches the fear and greed index

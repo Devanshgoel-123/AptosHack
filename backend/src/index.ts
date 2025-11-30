@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import axios from "axios";
 import { perpsRoutes } from "./Routes/perps";
 import { coingeckoRoutes } from "./Routes/coingecko";
@@ -13,6 +14,7 @@ export const axiosInstance = axios.create({
 });
 
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 
@@ -29,11 +31,11 @@ app.listen(PORT, () => {
   );
 });
 
-const main = async () => {
-  const perpsAdapter = new PerpsAdapter();
-  const positions = await perpsAdapter.getPositions(USER_ADDRESS)
-  console.log("Deposit successful");
-  console.log("Transaction hash:", positions);
-};
+//const main = async () => {
+//   const perpsAdapter = new PerpsAdapter();
+//   const positions = await perpsAdapter.getUserWalletBalance(USER_ADDRESS)
+//   console.log("Deposit successful");
+//   console.log("Transaction hash:", positions);
+// };
 
-main();
+// main();

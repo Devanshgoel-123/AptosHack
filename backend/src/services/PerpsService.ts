@@ -255,3 +255,23 @@ export const ExecuteTransaction = async (
     return null;
   }
 };
+
+
+export const GetUserWalletBalance = async (userAddress: string) => {
+  try {
+    const params = {
+      userAddress: userAddress,
+    };
+    const response = await axios.get(`${PERPS_ENDPOINT}/getWalletAccountBalance`, {
+      params,
+      headers: {
+        "x-api-key": process.env.API_KEY,
+      },
+    });
+    const userWalletBalance = response.data.data;
+    return parseFloat(userWalletBalance);
+  }catch(err){
+    console.error("Error getting user wallet balance:", err);
+    return null;
+  }
+};

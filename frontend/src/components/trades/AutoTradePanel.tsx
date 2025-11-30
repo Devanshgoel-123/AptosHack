@@ -11,18 +11,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAptosWallet } from "@/wallet/aptosWallet";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { activateAgent, deactivateAgent, analyzePerpTrade, type AnalysisResponse } from "@/services/api";
 import { toast } from "sonner";
 import { useAnalysisStore } from "@/store/analysisStore";
+import { openLong, openShort, getMarketId } from "@/services/perpAction";
+
 
 interface AutoTradePanelProps {
   selectedToken: any;
   onAnalysisUpdate?: (data: AnalysisResponse | null) => void;
 }
 
+// Cooldown constant - 2 minutes between trades
+const MIN_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes in milliseconds
+
 export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: AutoTradePanelProps) {
   // Use Zustand store for state management - use selectors for better performance
+  const [userAddress, setUserAddress] = useState<string | null>(null);
   const isActive = useAnalysisStore((state) => state.isActive);
   const token = useAnalysisStore((state) => state.token);
   const stablecoin = useAnalysisStore((state) => state.stablecoin);
@@ -42,12 +49,32 @@ export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: Auto
   
   const [isLoading, setIsLoading] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const executedSignalsRef = useRef<Set<string>>(new Set()); // Track executed signals to prevent duplicates
+  const lastTradeExecutionTimeRef = useRef<number | null>(null); // Track last trade execution timestamp
 
-  // Update token when selectedToken changes
+  // Update token when selectedToken changes and get wallet address
   useEffect(() => {
     if (selectedToken?.symbol) {
       setToken(selectedToken.symbol.toUpperCase());
     }
+    
+    // Get wallet address
+    const fetchWalletAddress = async () => {
+      try {
+        const wallet = getAptosWallet();
+        if (wallet) {
+          const account = await wallet.account();
+          console.log(account);
+          if (account?.address) {
+            setUserAddress(account.address);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching wallet address:", error);
+      }
+    };
+    
+    fetchWalletAddress();
   }, [selectedToken]);
 
   // Cleanup polling on unmount
@@ -68,10 +95,10 @@ export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: Auto
     // Poll immediately
     await pollAnalysis();
     
-    // Then poll every 1 second
+    // Then poll every 30 seconds
     pollingIntervalRef.current = setInterval(async () => {
       await pollAnalysis();
-    }, 1000);
+    }, 15000);
   };
 
   const stopPolling = () => {
@@ -80,6 +107,132 @@ export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: Auto
       pollingIntervalRef.current = null;
     }
   };
+
+  /**
+   * Calculate leverage based on risk level
+   */
+  const getLeverage = (riskLevel: string): number => {
+    switch (riskLevel) {
+      case "conservative":
+        return 1;
+      case "moderate":
+        return 2;
+      case "aggressive":
+        return 4;
+      default:
+        return 2;
+    }
+  };
+
+  /**
+   * Calculate position size based on portfolio amount and leverage
+   */
+  const getPositionSize = (portfolioAmount: number, leverage: number): number => {
+    // Use a percentage of portfolio (e.g., 80% of portfolio)
+    const positionPercentage = 0.8;
+    return portfolioAmount * positionPercentage * leverage;
+  };
+
+  /**
+   * Execute trade when signal is generated
+   */
+  const executeTrade = useCallback(async (data: AnalysisResponse) => {
+    // Check cooldown FIRST - before any other checks
+    const now = Date.now();
+    console.log("lastTradeExecutionTimeRef.current", lastTradeExecutionTimeRef.current);
+    console.log("now", now);
+    console.log("MIN_COOLDOWN_MS", MIN_COOLDOWN_MS);
+    if (lastTradeExecutionTimeRef.current !== null) {
+      const timeSinceLastTrade = now - lastTradeExecutionTimeRef.current;
+      if (timeSinceLastTrade < MIN_COOLDOWN_MS) {
+        const remainingSeconds = Math.ceil((MIN_COOLDOWN_MS - timeSinceLastTrade) / 1000);
+        console.log(`[COOLDOWN] Trade cooldown active. Please wait ${remainingSeconds} more seconds before executing another trade.`);
+        return;
+      }
+    }
+
+    // Check if user address is available
+    if (!userAddress) {
+      console.log("User address not available, skipping trade execution");
+      return;
+    }
+
+    // Determine side from recommendation - execute when LONG or SHORT
+    const side = data.recommendation;
+    if (side !== "LONG" && side !== "SHORT") {
+      console.log("Recommendation is HOLD, skipping trade execution");
+      return;
+    }
+
+    // Create a unique key for this signal to prevent duplicate executions
+    // Use iteration number if available, otherwise use timestamp
+    const signalKey = `${data.iteration !== undefined ? data.iteration : data.timestamp || Date.now()}-${side}-${data.execution_signal?.action || ''}`;
+    
+    // Skip if we've already executed this signal
+    if (executedSignalsRef.current.has(signalKey)) {
+      console.log("Signal already executed, skipping duplicate");
+      return;
+    }
+
+    // Check if there's already an open position
+    if (data.position_info?.status === "open") {
+      console.log("Position already open, skipping trade execution");
+      return;
+    }
+
+    // Get market ID for the token
+    const marketId = getMarketId(token);
+    if (!marketId) {
+      toast.error(`Market ID not found for token ${token}`);
+      return;
+    }
+
+    // Calculate leverage
+    const leverage = getLeverage(riskLevel);
+
+    // Final cooldown check right before API call as a safety guard
+    const finalCheckTime = Date.now();
+    if (lastTradeExecutionTimeRef.current !== null) {
+      const timeSinceLastTrade = finalCheckTime - lastTradeExecutionTimeRef.current;
+      if (timeSinceLastTrade < MIN_COOLDOWN_MS) {
+        const remainingSeconds = Math.ceil((MIN_COOLDOWN_MS - timeSinceLastTrade) / 1000);
+        console.warn(`[FINAL CHECK] Cooldown still active! Blocking trade. Wait ${remainingSeconds} more seconds.`);
+        return;
+      }
+    }
+
+    try {
+      toast.info(`Executing ${side} position for ${token}...`);
+      console.log(`[TRADE EXECUTION] Executing ${side} trade:`, { 
+        marketId, 
+        address: userAddress, 
+        leverage,
+        timestamp: new Date().toISOString(),
+        timeSinceLastTrade: lastTradeExecutionTimeRef.current ? finalCheckTime - lastTradeExecutionTimeRef.current : 'N/A'
+      });
+      
+      let result;
+      if (side === "LONG") {
+        result = await openLong(marketId, userAddress, leverage);
+        console.log("[TRADE EXECUTION] Long position opened:", result);
+      } else if (side === "SHORT") {
+        result = await openShort(marketId, userAddress, leverage);
+        console.log("[TRADE EXECUTION] Short position opened:", result);
+      }
+
+      // Mark this signal as executed and update last trade execution time
+      executedSignalsRef.current.add(signalKey);
+      const executionTimestamp = Date.now();
+      lastTradeExecutionTimeRef.current = executionTimestamp;
+      
+      toast.success(`${side} position opened successfully!`);
+      console.log(`[TRADE EXECUTION] Trade executed successfully at ${new Date(executionTimestamp).toISOString()}:`, result);
+      console.log(`[COOLDOWN] Next trade can be executed after ${new Date(executionTimestamp + MIN_COOLDOWN_MS).toISOString()}`);
+    } catch (error: any) {
+      console.error("Error executing trade:", error);
+      toast.error(`Failed to open ${side} position: ${error.message || error}`);
+    }
+  }, [token, portfolioAmount, riskLevel, userAddress]);
 
   const pollAnalysis = useCallback(async () => {
     try {
@@ -99,6 +252,18 @@ export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: Auto
       
       // Update Zustand store - this will trigger smooth updates in all components
       setAnalysisData(updatedData);
+      
+      // Execute trade when recommendation is LONG or SHORT from AI analysis
+      // Check cooldown before calling executeTrade to avoid unnecessary function calls
+      const canExecuteTrade = lastTradeExecutionTimeRef.current === null || 
+        (Date.now() - lastTradeExecutionTimeRef.current >= MIN_COOLDOWN_MS);
+      
+      if ((updatedData.recommendation === "LONG" || updatedData.recommendation === "SHORT") && canExecuteTrade) {
+        await executeTrade(updatedData);
+      } else if ((updatedData.recommendation === "LONG" || updatedData.recommendation === "SHORT") && !canExecuteTrade) {
+        const remainingSeconds = Math.ceil((MIN_COOLDOWN_MS - (Date.now() - (lastTradeExecutionTimeRef.current || 0))) / 1000);
+        console.log(`[POLL] Signal received but cooldown active. Waiting ${remainingSeconds} more seconds.`);
+      }
       
       // Add price point to history for smooth chart updates
       if (updatedData.market_data?.price) {
@@ -127,7 +292,7 @@ export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: Auto
       console.error("Polling error:", error);
       // Don't show toast on every polling error to avoid spam
     }
-  }, [token, stablecoin, portfolioAmount, riskLevel, setAnalysisData, addPricePoint, updateLastPricePoint, priceHistory, onAnalysisUpdate]);
+  }, [token, stablecoin, portfolioAmount, riskLevel, setAnalysisData, addPricePoint, updateLastPricePoint, priceHistory, onAnalysisUpdate, executeTrade]);
 
   const handleToggle = async (checked: boolean) => {
     if (checked) {
@@ -141,6 +306,9 @@ export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: Auto
           risk_level: riskLevel,
         });
         setIsActive(true);
+        // Clear executed signals and reset cooldown when reactivating
+        executedSignalsRef.current.clear();
+        lastTradeExecutionTimeRef.current = null;
         toast.success(`Agent activated for ${token}`);
         // Clear previous data
         setAnalysisData(null);
@@ -164,6 +332,9 @@ export default function AutoTradePanel({ selectedToken, onAnalysisUpdate }: Auto
         stopPolling();
         await deactivateAgent(token, stablecoin, portfolioAmount);
         setIsActive(false);
+        // Clear executed signals and reset cooldown when deactivating
+        executedSignalsRef.current.clear();
+        lastTradeExecutionTimeRef.current = null;
         setAnalysisData(null);
         if (onAnalysisUpdate) {
           onAnalysisUpdate(null);

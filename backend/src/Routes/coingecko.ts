@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import { getFearGreedIndex, getTokenAmountOwnedByAccount, fetchTokenPriceInUsd, getHistoricalPrice } from "../services/coingecko";
 import { SUCCESS_CODE, INTERNAL_SERVER_ERROR_CODE, BAD_REQUEST_CODE } from "../utils/constants";
 export const coingeckoRoutes = express.Router();
-
 coingeckoRoutes.use(express.json());
 
 coingeckoRoutes.get("/getFearGreedIndex", async (req: Request, res: Response) => {

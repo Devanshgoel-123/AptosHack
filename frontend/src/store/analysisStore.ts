@@ -32,7 +32,7 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
   portfolioAmount: 100.0,
   riskLevel: 'moderate',
   priceHistory: [],
-
+  
   // Actions
   setAnalysisData: (data) => {
     // Always create a deep copy to ensure React detects the change

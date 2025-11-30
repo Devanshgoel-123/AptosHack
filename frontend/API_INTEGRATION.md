@@ -9,7 +9,6 @@ The frontend is now fully integrated with the Perp DEX Agent API.
 ### 1. Start the Backend API
 
 ```bash
-cd /Users/soumikbaksi/Desktop/Sentenex
 source venv/bin/activate
 uvicorn app:app --reload --host 0.0.0.0 --port 8001
 ```
@@ -17,7 +16,6 @@ uvicorn app:app --reload --host 0.0.0.0 --port 8001
 ### 2. Start the Frontend
 
 ```bash
-cd /Users/soumikbaksi/Desktop/crypto-sentiment-trader
 npm install  # if needed
 npm run dev
 ```

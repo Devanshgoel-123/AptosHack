@@ -13,13 +13,13 @@ const perpsAdapter = new PerpsAdapter();
 
 perpsRoutes.post("/openLong", async (req: Request, res: Response) => {
   try {
-    const { marketId, size, leverage } = req.body;
-    if (!marketId || !size || !leverage) {
+    const { marketId, leverage, address } = req.body;
+    if (!marketId || !leverage || !address) {
       return res
         .status(BAD_REQUEST_CODE)
         .json({ message: "Invalid request body" });
     }
-    const position = await perpsAdapter.openLong(marketId, size, leverage);
+    const position = await perpsAdapter.openLong(marketId, leverage, address);
     if (!position) {
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
@@ -57,13 +57,13 @@ perpsRoutes.get("/getPositions", async (req: Request, res: Response) => {
 
 perpsRoutes.post("/openShort", async (req: Request, res: Response) => {
   try {
-    const { marketId, size, leverage } = req.body;
-    if (!marketId || !size || !leverage) {
+    const { marketId, address, leverage } = req.body;
+    if (!marketId || !address || !leverage) {
       return res
         .status(BAD_REQUEST_CODE)
         .json({ message: "Invalid request body" });
     }
-    const position = await perpsAdapter.openShort(marketId, size, leverage);
+    const position = await perpsAdapter.openShort(marketId, leverage, address);
     if (!position) {
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)

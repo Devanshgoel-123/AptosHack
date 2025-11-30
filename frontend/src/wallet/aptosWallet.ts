@@ -3,6 +3,14 @@ export type WalletAccount = {
   publicKey?: string;
 };
 
+export const getAptosWallet = () => {
+  if ('aptos' in window) {
+    return window.aptos;
+  } else {
+    window.open('https://petra.app/', `_blank`);
+  }
+};
+
 export async function connectPetra(): Promise<WalletAccount | null> {
   const aptos = (window as any).aptos;
   if (!aptos) {

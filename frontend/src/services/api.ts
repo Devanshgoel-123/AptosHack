@@ -31,17 +31,21 @@ export async function fetchMockSentiment(symbol: string) {
 
 // --- Aptos helpers (live data with graceful fallback) ---
 const APTOS_NODE = "https://fullnode.mainnet.aptoslabs.com/v1";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export async function fetchAptosBalance(address: string): Promise<number> {
   try {
     const res = await fetch(
-      `${APTOS_NODE}/accounts/${address}/resource/0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>`
+      `${API_BASE_URL}/api/v1/coingecko/getAptosBalance?address=${encodeURIComponent(address)}`
     );
-    if (!res.ok) throw new Error("balance not found");
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ message: "Failed to fetch balance" }));
+      throw new Error(error.message || "balance not found");
+    }
     const json = await res.json();
-    const octas = BigInt(json.data?.coin?.value ?? "0");
-    return Number(octas) / 1e8; // 1 APT = 1e8 Octas
+    return (Number(json.balance)/10**8) || 0;
   } catch (e) {
+    console.error("Error fetching Aptos balance:", e);
     // fallback mock
     return 0;
   }
@@ -118,7 +122,6 @@ export async function fetchAptPriceUsd(): Promise<number> {
 }
 
 // --- Perp DEX Agent API ---
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
 
 export interface ActivateAgentRequest {
   token: string;

@@ -1,69 +1,27 @@
-import React from "react";
-import { Header } from "./components/Header";
-import { TokensList } from "./components/TokensList";
-import { InfluencerTracker } from "./components/InfluencerTracker";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 
-const WalletsCard: React.FC = () => {
-  return (
-    <section className="card">
-      <h4>Wallets</h4>
-      <p className="muted small">Your connected wallets</p>
-      <div className="wallets">
-        <div className="wallet-row">
-          <div className="wallet-icon">💼</div>
-          <div>
-            <strong>Trading Wallet 1</strong>
-            <div className="muted tiny">0x1a2b...9b1j</div>
-          </div>
-          <div className="wallet-value">$15,420.5</div>
-        </div>
-        <div className="wallet-row">
-          <div className="wallet-icon">🧧</div>
-          <div>
-            <strong>HODLing Wallet</strong>
-            <div className="muted tiny">0x9b1j...b8a3</div>
-          </div>
-          <div className="wallet-value">$42,850.25</div>
-        </div>
-      </div>
-    </section>
-  );
-};
+const queryClient = new QueryClient();
 
-const AutoTradeCard: React.FC = () => (
-  <section className="card">
-    <h4>Auto-Trade / Risk</h4>
-    <p className="muted small">Configure trading parameters</p>
-    <div className="placeholder">Select a token to configure auto-trade settings</div>
-  </section>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
 );
-
-const SignalsCard: React.FC = () => (
-  <section className="card">
-    <h4>Signals & Backup</h4>
-    <p className="muted small">Signals: Buy when sentiment &gt; 0.8 and TVL/liquidity supports entry</p>
-    <button className="st-primary-btn full">Backup: Send Analysis</button>
-  </section>
-);
-
-const App: React.FC = () => {
-  return (
-    <div className="app-root">
-      <Header />
-      <main className="layout">
-        <div className="main-col">
-          <TokensList />
-          <InfluencerTracker />
-        </div>
-
-        <aside className="right-col">
-          <WalletsCard />
-          <AutoTradeCard />
-          <SignalsCard />
-        </aside>
-      </main>
-    </div>
-  );
-};
 
 export default App;

@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Neutral, high-contrast light theme */
+    --background: 248 0.3% 98.4%; /* soft off-white page */
+    --foreground: 265 4% 12.9%;  /* near-black text */
+
+    --card: 0 0% 100%;          /* true white cards */
+    --card-foreground: 265 4% 12.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 265 4% 12.9%;
+
+    --primary: 266 4% 20.8%;    /* neutral dark for buttons/links */
+    --primary-foreground: 248 0.3% 98.4%;
+
+    --secondary: 248 0.7% 96.8%;
+    --secondary-foreground: 266 4% 20.8%;
+
+    --muted: 248 0.7% 96.8%;
+    --muted-foreground: 257 4.6% 55.4%;
+
+    --accent: 248 0.7% 96.8%;
+    --accent-foreground: 266 4% 20.8%;
+
+    --destructive: 27 24.5% 57.7%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+    --info: 220 90% 56%;
+
+    --border: 256 1.3% 92.9%;
+    --input: 256 1.3% 92.9%;
+    --ring: 257 4% 70.4%;
+
+    --radius: 0.75rem;
+
+    --chart-1: 41 22.2% 64.6%;
+    --chart-2: 185 11.8% 60%;
+    --chart-3: 227 7% 39.8%;
+    --chart-4: 84 18.9% 82.8%;
+    --chart-5: 70 18.8% 76.9%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 0% / 0.04), hsl(0 0% 0% / 0.02));
+    --gradient-accent: linear-gradient(135deg, hsl(266 4% 20.8%), hsl(265 4% 12.9%));
+    --gradient-hero: radial-gradient(circle at 20% 50%, hsl(0 0% 0% / 0.06), transparent 50%),
+                     radial-gradient(circle at 80% 50%, hsl(0 0% 0% / 0.04), transparent 50%);
+    --glow-success: 0 0 20px hsl(142 76% 36% / 0.25);
+    --glow-info: 0 0 20px hsl(257 4% 70.4% / 0.25);
+  }
+
+  .dark {
+    /* Pure monochrome dark theme */
+    --background: 0 0% 10%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 14%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 14%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary actions = white with dark text for strong contrast */
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 10%;
+
+    /* Secondary surfaces = darker gray */
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 96%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 85%;
+
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 96%;
+
+    /* Semantic tokens remain grayscale */
+    --destructive: 0 0% 60%;
+    --destructive-foreground: 0 0% 10%;
+    --success: 0 0% 90%;
+    --warning: 0 0% 75%;
+    --info: 0 0% 85%;
+
+    --border: 0 0% 100% / 18%;
+    --input: 0 0% 100% / 16%;
+    --ring: 0 0% 100% / 40%;
+
+    /* Grayscale charts */
+    --chart-1: 0 0% 95%;
+    --chart-2: 0 0% 80%;
+    --chart-3: 0 0% 65%;
+    --chart-4: 0 0% 50%;
+    --chart-5: 0 0% 35%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-image:
+      radial-gradient(circle at 20% 50%, hsl(0 0% 0% / 0.03), transparent 50%),
+      radial-gradient(circle at 80% 50%, hsl(0 0% 0% / 0.02), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* Improve placeholder/readability */
+  input::placeholder, textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+    opacity: 1;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(circle at 20% 50%, hsl(0 0% 100% / 0.04), transparent 55%),
+      radial-gradient(circle at 80% 50%, hsl(0 0% 100% / 0.03), transparent 55%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .glow-success {
+    box-shadow: var(--glow-success);
+  }
+
+  .glow-info {
+    box-shadow: var(--glow-info);
+  }
+}

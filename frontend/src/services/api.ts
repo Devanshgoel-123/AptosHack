@@ -28,6 +28,7 @@ export async function fetchMockSentiment(symbol: string) {
 
 // --- Aptos helpers (live data with graceful fallback) ---
 const APTOS_NODE = "https://fullnode.mainnet.aptoslabs.com/v1";
+export const AGENT_URL="http://localhost:8001";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export async function fetchAptosBalance(address: string): Promise<number> {
@@ -157,7 +158,8 @@ export interface AnalysisResponse {
 }
 
 export async function activateAgent(request: ActivateAgentRequest): Promise<any> {
-  const response = await fetch(`${API_BASE_URL}/api/activate`, {
+  
+  const response = await fetch(`${AGENT_URL}/api/activate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
@@ -174,7 +176,7 @@ export async function deactivateAgent(
   stablecoin: string,
   portfolio_amount: number
 ): Promise<any> {
-  const response = await fetch(`${API_BASE_URL}/api/deactivate`, {
+  const response = await fetch(`${AGENT_URL}/api/deactivate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, stablecoin, portfolio_amount }),
@@ -187,7 +189,7 @@ export async function deactivateAgent(
 }
 
 export async function analyzePerpTrade(request: ActivateAgentRequest): Promise<AnalysisResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/analyze`, {
+  const response = await fetch(`${AGENT_URL}/api/analyze`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
@@ -216,7 +218,7 @@ export async function fetchHistoricalData(
   token: string,
   days: number = 30
 ): Promise<HistoricalDataResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/historical/${token}?days=${days}`);
+  const response = await fetch(`${AGENT_URL}/api/historical/${token}?days=${days}`);
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: "Failed to fetch historical data" }));
     throw new Error(error.detail || "Failed to fetch historical data");

@@ -100,7 +100,7 @@ export default function DashboardHeader({ onAddWallet }: DashboardHeaderProps) {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-2xl font-bold">
               <Trophy className="w-7 h-7" />
-              <span className="text-foreground">Aptos Sentiment Trader</span>
+              <span className="text-foreground">Sentenex</span>
             </div>
           </div>
 

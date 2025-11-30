@@ -5,12 +5,15 @@ export class PerpsAdapter {
 
   async openLong( marketId: number, leverage: number, address: string): Promise<boolean> {
     const walletBalanceInUSDT= await this.getUserWalletBalance(address);
+    console.log("walletBalanceInUSDT", walletBalanceInUSDT);
     if(walletBalanceInUSDT < 1) {
       return true;
     }
     const tokenPriceInUSDT = marketId === APT_MARKET_ID ? await fetchTokenPriceInUsd(APT_TOKEN_ADDRESS) : await fetchTokenPriceInUsd(BTC_TOKEN_ADDRESS);
-    const tradeSize = Number((Math.floor(walletBalanceInUSDT)/tokenPriceInUSDT).toFixed(marketId === APT_MARKET_ID ? APT_PRECISION : BTC_PRECISION));
-   const position = await PlaceLimitOrder(
+    console.log("tokenPriceInUSDT", tokenPriceInUSDT);
+    const tradeSize = Number((Math.floor(walletBalanceInUSDT * leverage)/tokenPriceInUSDT).toFixed(marketId === APT_MARKET_ID ? APT_PRECISION : BTC_PRECISION));
+    console.log("tradeSize", tradeSize);
+    const position = await PlaceLimitOrder(
       marketId,
       tradeSize,
       "long",

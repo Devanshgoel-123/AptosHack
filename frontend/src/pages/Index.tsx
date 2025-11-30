@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, Zap } from "lucide-react";
 import { toast } from "sonner";
 import WalletOverview from "@/components/wallets/WalletOverview";
+import PositionsPanel from "@/components/trades/PositionsPanel";
 
 const Index = () => {
   const [tokens, setTokens] = useState<any[]>([]);
@@ -246,6 +247,9 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">Connect your wallet to view balance and recent transactions.</p>
               </Card>
             )}
+
+            {/* Positions Panel */}
+            <PositionsPanel address={connectedAccount?.address || null} />
 
             {/* Auto-Trade Settings */}
             <AutoTradePanel 

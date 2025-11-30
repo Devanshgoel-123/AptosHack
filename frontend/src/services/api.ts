@@ -3,10 +3,7 @@
 export async function fetchMockTokens() {
   return [
     { symbol: 'APT', name: 'Aptos', price: 8.42, market: 'Crypto', liquidityUsd: 45000000, change24h: 5.2 },
-    { symbol: 'MEME', name: 'Meme Coin', price: 0.0042, market: 'Meme', liquidityUsd: 1200000, change24h: -2.1 },
-    { symbol: 'PRIV', name: 'Privacy Token', price: 12.34, market: 'Privacy', liquidityUsd: 8900000, change24h: 8.7 },
-    { symbol: 'ZLA', name: 'Zilla', price: 0.89, market: 'Gaming', liquidityUsd: 560000, change24h: 15.3 },
-    { symbol: 'DOGE', name: 'Dogecoin', price: 0.12, market: 'Meme', liquidityUsd: 89000000, change24h: -0.8 },
+
   ];
 }
 

@@ -35,13 +35,13 @@ perpsRoutes.post("/openLong", async (req: Request, res: Response) => {
 
 perpsRoutes.get("/getPositions", async (req: Request, res: Response) => {
   try {
-    const { address } = req.body;
+    const { address } = req.query;
     if (!address) {
       return res
         .status(BAD_REQUEST_CODE)
-        .json({ message: "Invalid request body" });
+        .json({ message: "Invalid query parameter: address is required" });
     }
-    const positions = await perpsAdapter.getPositions(address);
+    const positions = await perpsAdapter.getPositions(address as string);
     if (!positions) {
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
@@ -80,11 +80,11 @@ perpsRoutes.post("/openShort", async (req: Request, res: Response) => {
 
 perpsRoutes.get("/getOrderHistory", async (req: Request, res: Response) => {
   try{
-    const { address } = req.body;
+    const { address } = req.query;
     if(!address) {
-      return res.status(BAD_REQUEST_CODE).json({ message: "Invalid request body" });
+      return res.status(BAD_REQUEST_CODE).json({ message: "Invalid query parameter: address is required" });
     }
-    const orderHistory = await perpsAdapter.getOrderHistory(address);
+    const orderHistory = await perpsAdapter.getOrderHistory(address as string);
     if(!orderHistory) {
       return res.status(INTERNAL_SERVER_ERROR_CODE).json({ message: "Failed to get order history" });
     }

@@ -2,18 +2,9 @@ import { CreateDeposit, GetOrderBook, GetOrderHistory, GetPositions, PlaceLimitO
 export class PerpsAdapter {
 
   async openLong( marketId: number, size: number, leverage: number): Promise<boolean> {
-    const {
-      bestAskPrice,
-      bestBidPrice
-    }= await GetOrderBook(marketId);
-    if (!bestAskPrice || !bestBidPrice) {
-      throw new Error("Failed to get order book");
-    }
-    const price = parseInt(((bestAskPrice+bestBidPrice)/2).toString());
-    const position = await PlaceLimitOrder(
+   const position = await PlaceLimitOrder(
       marketId,
       size,
-      price,
       "long",
       leverage
     )
@@ -21,18 +12,17 @@ export class PerpsAdapter {
   };
 
   async openShort(marketId: number, size: number, leverage: number): Promise<boolean> {
-    const {
-      bestAskPrice,
-      bestBidPrice
-    }= await GetOrderBook(marketId);
-    if (!bestAskPrice || !bestBidPrice) {
-      throw new Error("Failed to get order book");
-    }
-    const price = parseInt(((bestAskPrice+bestBidPrice)/2).toString());
+    // const {
+    //   bestAskPrice,
+    //   bestBidPrice
+    // }= await GetOrderBook(marketId);
+    // if (!bestAskPrice || !bestBidPrice) {
+    //   throw new Error("Failed to get order book");
+    // }
+   // const price = parseInt(((bestAskPrice+bestBidPrice)/2).toString());
     const position = await PlaceLimitOrder(
       marketId,
       size,
-      price,
       "short",
       leverage
     )

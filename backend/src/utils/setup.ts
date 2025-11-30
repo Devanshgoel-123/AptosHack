@@ -7,10 +7,10 @@ import { AptosConfig, Aptos, Network, Account,PrivateKey, Ed25519PrivateKey, Pri
 dotenv.config();
 
 // Setup the client
-export const config = new AptosConfig({ network: Network.TESTNET });
+export const config = new AptosConfig({ network: Network.MAINNET });
 export const aptos = new Aptos(config);
 export const formattedPrivateKey = PrivateKey.formatPrivateKey(
-    process.env.APTOS_PRIVATEKEY || '',
+    process.env.APTOS_PRIVATE_KEY || '',
     'ed25519' as PrivateKeyVariants
 );
 export const account = Account.fromPrivateKey({

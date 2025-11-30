@@ -2,7 +2,8 @@ import axios from "axios";
 import { PERPS_ENDPOINT, USDC_DECIMALS } from "../utils/constants";
 import { account, aptos } from "../utils/setup";
 import { SimpleTransaction } from "@aptos-labs/ts-sdk";
-
+import dotenv from "dotenv";
+dotenv.config();
 /**
  * @function CreateDeposit
  * @param userAddress string
@@ -14,10 +15,11 @@ import { SimpleTransaction } from "@aptos-labs/ts-sdk";
  */
 export const CreateDeposit = async (userAddress: string, amount: number) => {
   try {
-    const formattedAmount = parseInt((amount * 10 ** USDC_DECIMALS).toString());
+    // const formattedAmount = parseInt((amount * 10 ** USDC_DECIMALS).toString());
+    console.log("Formatted amount:", amount);
     const params = {
       userAddress: userAddress,
-      amount: formattedAmount,
+      amount: amount,
     };
     const response = await axios.get(`${PERPS_ENDPOINT}/deposit`, {
       params,
@@ -31,6 +33,7 @@ export const CreateDeposit = async (userAddress: string, amount: number) => {
         sender: account.accountAddress,
         data: payloadData,
       });
+    console.log("Transaction payload:", transactionPayload);  
     const executedTransaction = await ExecuteTransaction(transactionPayload);
     return executedTransaction;
   } catch (error) {
@@ -74,7 +77,6 @@ export const GetOrderBook = async (
 export const PlaceLimitOrder = async (
   marketId: number,
   size: number,
-  price: number,
   side: string,
   leverage: number = 1
 ) => {
@@ -83,11 +85,11 @@ export const PlaceLimitOrder = async (
     const params = {
       marketId: marketId,
       size: size,
-      price: price,
-      side: sideValue,
+      tradeSide: sideValue,
       leverage: leverage,
+      direction: false,
     };
-    const response = await axios.get(`${PERPS_ENDPOINT}/placeLimitOrder`, {
+    const response = await axios.get(`${PERPS_ENDPOINT}/placeMarketOrder`, {
       params,
       headers: {
         "x-api-key": process.env.API_KEY,
@@ -149,8 +151,11 @@ export const GetPositions = async (userAddress: string) => {
     };
     const response = await axios.get(`${PERPS_ENDPOINT}/getPositions`, {
       params,
+      headers: {
+        "x-api-key": process.env.API_KEY,
+      },
     });
-    const positions = response.data;
+    const positions = response.data.data;
     return positions;
   } catch (err) {
     console.error("Error getting positions:", err);

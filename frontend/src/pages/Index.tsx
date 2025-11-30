@@ -262,11 +262,11 @@ const Index = () => {
                 Simulate trades with current market conditions
               </p>
               <div className="flex gap-3">
-                <Button onClick={handleBuy} className="flex-1 bg-success hover:bg-success/90 text-foreground shadow-sm">
-                  Sim Buy
+                <Button onClick={handleBuy} className="flex-1 bg-foreground text-background hover:bg-foreground/90 shadow-sm">
+                   Buy
                 </Button>
                 <Button onClick={handleSell} variant="outline" className="flex-1 border-foreground/30 text-foreground hover:bg-foreground/5">
-                  Sim Sell
+                   Sell
                 </Button>
               </div>
             </Card>

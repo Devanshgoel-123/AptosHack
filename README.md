@@ -2,6 +2,8 @@
 
 ### AI agent that reads market sentiment and trades perpetuals on Aptos
 
+🏆 **Won $2,000 at the Aptos Hackathon**
+
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
